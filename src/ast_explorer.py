@@ -79,12 +79,12 @@ def analyze_file(filename):
         for node in ast.walk(tree):
             if isinstance(node, ast.FunctionDef):
                 function_count += 1
-                print(f"📌 Found function: {node.name}")
+                print(f" Found function: {node.name}")
             
             elif isinstance(node, ast.Constant) and isinstance(node.value, str):
                 string_count += 1
                 if len(node.value) > 50:  # Long strings might be SQL
-                    print(f"📝 Long string (might be SQL): {node.value[:50]}...")
+                    print(f" Long string (might be SQL): {node.value[:50]}...")
             
             elif isinstance(node, ast.Call):
                 # Check for cursor.execute() calls
@@ -93,15 +93,15 @@ def analyze_file(filename):
                     sql_execute_calls += 1
                     print(f"⚡ Found SQL execute call on line {node.lineno}")
         
-        print(f"\n📊 Summary for {filename}:")
+        print(f"\n Summary for {filename}:")
         print(f"  Functions: {function_count}")
         print(f"  String constants: {string_count}")
         print(f"  SQL execute calls: {sql_execute_calls}")
         
     except FileNotFoundError:
-        print(f"❌ File {filename} not found!")
+        print(f"File {filename} not found!")
     except SyntaxError as e:
-        print(f"❌ Syntax error: {e}")
+        print(f" Syntax error: {e}")
 
 # Test it
 if __name__ == "__main__":
