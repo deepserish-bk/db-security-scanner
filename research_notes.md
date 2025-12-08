@@ -19,3 +19,24 @@ The analyzer checks for:
 
 Next steps: Add more analyzers for other vulnerabilities.
 
+
+## Day 4: Hardcoded Secrets Detection
+
+Today I implemented an analyzer for hardcoded secrets like passwords and API keys.
+
+Key learnings:
+1. Secrets in code are a major security risk - they can be easily extracted
+2. Common patterns to look for: 'password', 'api_key', 'secret', 'token'
+3. Long strings (>20 chars) without http:// might be secrets
+4. Regular expressions help identify suspicious variable names
+
+The analyzer detects:
+- Variables with names suggesting they contain secrets
+- Long string constants that might be credentials
+- Different severity levels based on confidence
+
+Best practices:
+1. Use environment variables for secrets
+2. Use secure secret management services
+3. Never commit secrets to version control
+
