@@ -40,3 +40,26 @@ Best practices:
 2. Use secure secret management services
 3. Never commit secrets to version control
 
+
+## Day 5: Main Analyzer Runner and Integration
+
+Today I created the main orchestrator that runs all security analyzers together.
+
+Key achievements:
+1. Built a unified SecurityAnalyzer class that coordinates multiple analyzers
+2. Added file and directory scanning capabilities
+3. Implemented colored terminal output for better visibility
+4. Created a summary report with severity counts
+5. Added proper exit codes (0 for success, 1 for vulnerabilities found)
+
+Features:
+- Single command to analyze files or directories
+- Color-coded output based on severity
+- Summary statistics
+- Integration of SQL injection and hardcoded secrets analyzers
+
+Usage:
+```bash
+python src/main.py <file_or_directory>
+python src/main.py tests/vulnerable_test.py
+python src/main.py .

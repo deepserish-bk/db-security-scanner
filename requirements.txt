@@ -1,0 +1,12 @@
+# Database Security Static Analyzer
+# Python 3.7+ required
+
+# Core dependencies
+astunparse>=1.6.3  # For Python versions without ast.unparse
+
+# Development dependencies
+pytest>=7.0.0
+pytest-cov>=4.0.0
+
+# For future features
+Jinja2>=3.0.0  # For HTML reports
