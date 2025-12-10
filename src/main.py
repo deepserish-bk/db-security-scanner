@@ -1,25 +1,31 @@
+
 #!/usr/bin/env python3
 """
-Day 5: Main Security Analyzer Runner
-Orchestrates all security analyzers
+Main Security Analyzer with Enhanced Reporting
 """
 
 import os
 import sys
-from datetime import datetime
 
-# Import analyzers
+# Add the parent directory to Python path so we can import from src
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Now we can import from src.analyzers
 from src.analyzers.sql_injection import SQLInjectionAnalyzer
 from src.analyzers.hardcoded_secrets import HardcodedSecretsAnalyzer
 
+# Import enhanced reporter
+from src.utils.reporter import ReportGenerator
+
 class SecurityAnalyzer:
-    """Main security analyzer that runs all checks"""
+    """Main security analyzer with comprehensive reporting"""
     
     def __init__(self):
         self.analyzers = [
             ("SQL Injection", SQLInjectionAnalyzer()),
             ("Hardcoded Secrets", HardcodedSecretsAnalyzer())
         ]
+        self.reporter = ReportGenerator()
         self.results = []
     
     def analyze_file(self, filepath):
@@ -32,95 +38,201 @@ class SecurityAnalyzer:
                 code = f.read()
         except FileNotFoundError:
             print(f"❌ File not found: {filepath}")
-            return
+            return []
+        except UnicodeDecodeError:
+            print(f"❌ Cannot read file (encoding issue): {filepath}")
+            return []
         
         file_results = []
         
         for analyzer_name, analyzer in self.analyzers:
-            vulnerabilities = analyzer.analyze(code, filepath)
-            for vuln in vulnerabilities:
-                file_results.append(vuln)
-                # Print findings
-                severity_color = {
-                    'HIGH': '\033[91m',   # Red
-                    'MEDIUM': '\033[93m', # Yellow
-                    'LOW': '\033[94m'     # Blue
-                }.get(vuln['severity'], '\033[0m')
-                
-                print(f"{severity_color}⚠️  [{vuln['severity']}] {vuln['type']}")
-                print(f"   {filepath}:{vuln['line']} - {vuln['message']}")
-                print(f"\033[0m")
+            try:
+                vulnerabilities = analyzer.analyze(code, filepath)
+                for vuln in vulnerabilities:
+                    vuln['analyzer'] = analyzer_name
+                    file_results.append(vuln)
+            except Exception as e:
+                print(f"❌ Error in {analyzer_name} analyzer: {e}")
         
-        if not file_results:
+        # Display findings
+        if file_results:
+            for vuln in file_results:
+                severity = vuln.get('severity', 'INFO')
+                color = {
+                    'HIGH': '\033[91m',
+                    'MEDIUM': '\033[93m',
+                    'LOW': '\033[94m',
+                    'INFO': '\033[96m'
+                }.get(severity, '\033[0m')
+                
+                print(f"{color}⚠️  [{severity}] {vuln['type']}")
+                print(f"   {filepath}:{vuln['line']} - {vuln['message']}")
+                if 'recommendation' in vuln:
+                    print(f"   💡 {vuln['recommendation']}")
+                print("\033[0m")
+        else:
             print("✅ No vulnerabilities found!")
         
+        self.results.extend(file_results)
         return file_results
     
     def analyze_directory(self, dirpath):
         """Analyze all Python files in a directory"""
         all_results = []
         
+        # Count files first
+        python_files = []
         for root, dirs, files in os.walk(dirpath):
             for file in files:
                 if file.endswith('.py'):
-                    filepath = os.path.join(root, file)
-                    results = self.analyze_file(filepath)
-                    if results:
-                        all_results.extend(results)
+                    python_files.append(os.path.join(root, file))
+        
+        print(f"\n📁 Found {len(python_files)} Python files to analyze")
+        
+        # Analyze each file
+        for i, filepath in enumerate(python_files, 1):
+            print(f"\n[{i}/{len(python_files)}] ", end="")
+            results = self.analyze_file(filepath)
+            if results:
+                all_results.extend(results)
         
         return all_results
     
-    def generate_report(self, results):
-        """Generate a summary report"""
+    def generate_report(self, format='text', output_file=None):
+        """Generate a comprehensive report"""
+        if not self.results:
+            print("\n📊 No vulnerabilities found to report.")
+            return ""
+        
+        print(f"\n📊 Generating {format.upper()} report...")
+        
+        if format == 'json':
+            report = self.reporter.generate_json_report(self.results, output_file)
+        elif format == 'html':
+            report = self.reporter.generate_html_report(self.results, output_file)
+        else:
+            report = self.reporter.generate_text_report(self.results, output_file)
+        
+        if not output_file:
+            print("\n" + "=" * 60)
+            print("📋 REPORT OUTPUT")
+            print("=" * 60)
+            if format == 'text':
+                print(report)
+            else:
+                print(f"{format.upper()} report generated successfully")
+                print("Use --output <filename> to save to a file")
+        
+        return report
+    
+    def print_summary(self):
+        """Print a summary of findings"""
+        if not self.results:
+            print("\n🎉 Great! No security vulnerabilities found!")
+            return True
+        
         print("\n" + "=" * 60)
-        print("📊 SECURITY ANALYSIS REPORT")
+        print("📈 ANALYSIS SUMMARY")
         print("=" * 60)
-        print(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        print(f"Total vulnerabilities found: {len(results)}")
         
         # Count by severity
-        severity_counts = {'HIGH': 0, 'MEDIUM': 0, 'LOW': 0}
-        for result in results:
-            severity_counts[result['severity']] = severity_counts.get(result['severity'], 0) + 1
+        severity_counts = {'HIGH': 0, 'MEDIUM': 0, 'LOW': 0, 'INFO': 0}
+        analyzer_counts = {}
         
-        print("\nSeverity Summary:")
-        for severity, count in severity_counts.items():
+        for result in self.results:
+            severity = result.get('severity', 'INFO')
+            analyzer = result.get('analyzer', 'Unknown')
+            
+            severity_counts[severity] = severity_counts.get(severity, 0) + 1
+            analyzer_counts[analyzer] = analyzer_counts.get(analyzer, 0) + 1
+        
+        print(f"\n📊 Total vulnerabilities: {len(self.results)}")
+        
+        print("\n⚠️  Severity Breakdown:")
+        for severity in ['HIGH', 'MEDIUM', 'LOW', 'INFO']:
+            count = severity_counts.get(severity, 0)
             if count > 0:
-                print(f"  {severity}: {count}")
+                color = {
+                    'HIGH': '\033[91m',
+                    'MEDIUM': '\033[93m',
+                    'LOW': '\033[94m',
+                    'INFO': '\033[96m'
+                }.get(severity, '\033[0m')
+                print(f"  {color}{severity}: {count}\033[0m")
         
-        return severity_counts
+        print("\n🔧 Analyzer Breakdown:")
+        for analyzer, count in sorted(analyzer_counts.items()):
+            print(f"  {analyzer}: {count}")
+        
+        # Return True if no critical issues
+        return severity_counts.get('HIGH', 0) == 0
 
 def main():
-    """Main entry point"""
+    """Main entry point with enhanced CLI"""
     if len(sys.argv) < 2:
-        print("Usage: python src/main.py <file_or_directory>")
-        print("Example: python src/main.py tests/vulnerable_test.py")
+        print("""
+🔒 Database Security Static Analyzer
+
+Usage: python src/main.py <file_or_directory> [options]
+
+Options:
+  --format <text|json|html>  Output format (default: text)
+  --output <filename>         Save report to file
+
+Examples:
+  python src/main.py tests/vulnerable_test.py
+  python src/main.py . --format json
+  python src/main.py src/ --output report.html
+        """)
         sys.exit(1)
     
     target = sys.argv[1]
+    output_format = 'text'
+    output_file = None
+    
+    # Parse optional arguments
+    i = 2
+    while i < len(sys.argv):
+        if sys.argv[i] == '--format' and i + 1 < len(sys.argv):
+            output_format = sys.argv[i + 1]
+            i += 2
+        elif sys.argv[i] == '--output' and i + 1 < len(sys.argv):
+            output_file = sys.argv[i + 1]
+            i += 2
+        else:
+            i += 1
+    
     analyzer = SecurityAnalyzer()
     
     print("\n" + "=" * 60)
     print("🔒 DATABASE SECURITY STATIC ANALYZER")
     print("=" * 60)
+    print(f"Target: {target}")
+    print(f"Output format: {output_format}")
+    if output_file:
+        print(f"Output file: {output_file}")
     
-    if os.path.isfile(target):
-        results = analyzer.analyze_file(target)
-    elif os.path.isdir(target):
-        results = analyzer.analyze_directory(target)
-    else:
-        print(f"❌ Target not found: {target}")
+    # Check if target exists
+    if not os.path.exists(target):
+        print(f"\n❌ Error: Target '{target}' not found")
         sys.exit(1)
     
-    analyzer.generate_report(results)
+    # Analyze target
+    if os.path.isfile(target):
+        analyzer.analyze_file(target)
+    else:
+        analyzer.analyze_directory(target)
     
-    # Exit with appropriate code
-    if any(r['severity'] == 'HIGH' for r in results):
+    # Generate report
+    analyzer.generate_report(output_format, output_file)
+    
+    # Print summary and exit
+    if analyzer.print_summary():
+        print("\n✅ Analysis completed successfully!")
+        sys.exit(0)
+    else:
         print("\n❌ Critical security issues found!")
         sys.exit(1)
-    else:
-        print("\n✅ Analysis complete!")
-        sys.exit(0)
 
 if __name__ == "__main__":
     main()

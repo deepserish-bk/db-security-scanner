@@ -58,8 +58,107 @@ Features:
 - Summary statistics
 - Integration of SQL injection and hardcoded secrets analyzers
 
-Usage:
+
+## Day 6: Enhanced Reporting System
+
+Today I focused on building a comprehensive reporting system for the security analyzer.
+
+### 🎯 Objectives Achieved:
+
+1. **Professional ReportGenerator class** with:
+   - Text reports (detailed, human-readable)
+   - JSON reports (structured, machine-readable)
+   - HTML reports (visual, web-friendly)
+
+2. **Enhanced output features**:
+   - Color-coded severity levels
+   - Summary statistics
+   - Detailed vulnerability listings
+   - Actionable recommendations
+   - Code snippets for context
+
+3. **Improved main analyzer**:
+   - Better command-line interface
+   - Support for multiple output formats
+   - File output capability
+   - Cleaner code organization
+
+### 📊 Report Features:
+
+**Text Reports:**
+- Clear severity breakdown (HIGH, MEDIUM, LOW, INFO)
+- Location information (file:line)
+- Code snippets
+- Recommendations summary
+- Easy to read in terminal
+
+**JSON Reports:**
+- Structured data for integration
+- Metadata (timestamp, version)
+- Summary statistics
+- All vulnerability details
+- Can be consumed by other tools
+
+**HTML Reports:**
+- Visual presentation with colors
+- Responsive design
+- Severity-based styling
+- Easy to share and view in browsers
+- Professional appearance
+
+### 🔧 Technical Implementation:
+
+1. **ReportGenerator Class**:
+   - Separate module for report generation
+   - Consistent API for all formats
+   - Summary statistics calculation
+   - File writing with proper error handling
+
+2. **Color Coding**:
+   - HIGH: Red (critical issues)
+   - MEDIUM: Yellow (warnings)
+   - LOW: Blue (informational)
+   - INFO: Cyan (notes)
+
+3. **Error Handling**:
+   - Graceful degradation
+   - Informative error messages
+   - File I/O safety
+
+### 🧪 Testing:
+
+Created comprehensive test suite:
+- Unit tests for report generation
+- Sample vulnerabilities for demonstration
+- All three formats tested
+- File output verification
+
+### 🚀 Usage Examples:
+
 ```bash
-python src/main.py <file_or_directory>
-python src/main.py tests/vulnerable_test.py
-python src/main.py .
+# Basic analysis with text output
+python src/main.py mycode.py
+
+# JSON report for integration
+python src/main.py . --format json --output report.json
+
+# HTML report for sharing
+python src/main.py src/ --format html --output security_report.html
+```
+
+### 📈 Next Steps (for Day 7):
+
+1. Create professional CLI interface
+2. Add more analyzers (input validation, config issues)
+3. Add configuration file support
+4. Improve performance for large codebases
+5. Add test coverage reporting
+
+### 💡 Key Learnings:
+
+1. Building good reports is crucial for tool adoption
+2. Multiple formats serve different use cases
+3. Color coding improves readability
+4. Structured data (JSON) enables integration
+5. HTML reports are great for non-technical stakeholders
+
