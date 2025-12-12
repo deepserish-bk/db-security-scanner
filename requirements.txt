@@ -1,12 +1,16 @@
-# Database Security Static Analyzer
+# Static Analysis Tool for Database Security
 # Python 3.7+ required
 
 # Core dependencies
-astunparse>=1.6.3  # For Python versions without ast.unparse
+astunparse==1.6.3  # For Python versions without ast.unparse
 
 # Development dependencies
-pytest>=7.0.0
-pytest-cov>=4.0.0
+pytest==7.4.0
+pytest-cov==4.1.0
+black==23.9.1
+flake8==6.1.0
+mypy==1.5.1
 
-# For future features
-Jinja2>=3.0.0  # For HTML reports
+# Optional: For advanced analysis
+sqlparse==0.4.4  # SQL parsing
+python-magic==0.4.27  # File type detection

@@ -1,6 +1,6 @@
-
+#!/usr/bin/env python3
 """
-Day 4: Hardcoded Secrets Detection
+Hardcoded Secrets Detection
 Detects passwords, API keys, and other secrets in code
 """
 
@@ -51,6 +51,7 @@ class HardcodedSecretsAnalyzer:
                         type="Hardcoded Secret",
                         severity="HIGH",
                         message=f"Hardcoded {pattern_name} found in variable '{var_name}'",
+                        code=f"{var_name} = '{value[:20]}...'" if len(value) > 20 else f"{var_name} = '{value}'",
                         recommendation="Use environment variables or secret management"
                     )
             
@@ -62,6 +63,7 @@ class HardcodedSecretsAnalyzer:
                     type="Suspicious String",
                     severity="MEDIUM",
                     message="Long string that might be a secret",
+                    code=f"Variable value: '{value[:30]}...'",
                     recommendation="Review if this should be hardcoded"
                 )
     

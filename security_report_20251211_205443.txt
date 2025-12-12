@@ -1,0 +1,16 @@
+
+============================================================
+SECURITY ANALYSIS REPORT
+============================================================
+Generated: 2025-12-11 20:54:43
+Total vulnerabilities found: 3
+
+📊 Severity Summary:
+  [91mHIGH: 1[0m
+  [93mMEDIUM: 1[0m
+  [96mINFO: 1[0m
+
+🔧 Analyzer Breakdown:
+  DB: 1
+  SECRETS: 1
+  SQL: 1
