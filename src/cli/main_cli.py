@@ -1,7 +1,12 @@
+#!/usr/bin/env python3
+"""
+DAY 8: Enhanced CLI with HTML Reports
+Learning: Integrating HTML report generation into CLI
+"""
+
 import argparse
 import sys
 import os
-from pathlib import Path
 import json
 from datetime import datetime
 
@@ -16,12 +21,14 @@ try:
     from src.analyzers.hardcoded_secrets import HardcodedSecretsAnalyzer
     from src.analyzers.database_connection import DatabaseConnectionAnalyzer
     from src.analyzers.input_validation import InputValidationAnalyzer
+    from src.report.html_generator import HTMLReportGenerator
     
     ANALYZERS_AVAILABLE = True
+    HTML_REPORTS_AVAILABLE = True
 except ImportError as e:
-    print(f"⚠️  Some analyzers not available: {e}")
-    print("⚠️  Make sure all analyzer files exist in src/analyzers/")
+    print(f"⚠️  Some modules not available: {e}")
     ANALYZERS_AVAILABLE = False
+    HTML_REPORTS_AVAILABLE = False
 
 class SecurityAnalyzerCLI:
     """Main CLI interface for the security analyzer"""
@@ -37,39 +44,44 @@ class SecurityAnalyzerCLI:
                 'input': InputValidationAnalyzer()
             }
         
-        # Color codes for terminal output - FIXED: No 'RED' key
+        # Initialize HTML reporter if available
+        self.html_reporter = HTMLReportGenerator() if HTML_REPORTS_AVAILABLE else None
+        
+        # Color codes for terminal output
         self.colors = {
-            'HIGH': '\033[91m',     # Red
-            'MEDIUM': '\033[93m',   # Yellow
-            'LOW': '\033[94m',      # Blue
-            'INFO': '\033[96m',     # Cyan
-            'RESET': '\033[0m',     # Reset
-            'GREEN': '\033[92m',    # Green
-            'BOLD': '\033[1m'       # Bold
+            'HIGH': '\033[91m',
+            'MEDIUM': '\033[93m',
+            'LOW': '\033[94m',
+            'INFO': '\033[96m',
+            'RESET': '\033[0m',
+            'GREEN': '\033[92m',
+            'BOLD': '\033[1m',
+            'CYAN': '\033[96m'
         }
     
     def print_banner(self):
         """Print tool banner"""
         banner = f"""
-{self.colors['BOLD']}{self.colors['GREEN']}
+{self.colors['BOLD']}{self.colors['CYAN']}
 ╔══════════════════════════════════════════════════════════╗
 ║          DATABASE SECURITY STATIC ANALYZER               ║
 ║                   30-Day Learning Project                ║
-║                        Day 7: CLI Interface              ║
+║                      Day 8: HTML Reports                 ║
 ╚══════════════════════════════════════════════════════════╝{self.colors['RESET']}
         """
         print(banner)
         
-        # Show available analyzers
-        print(f"\n{self.colors['BOLD']}Available Analyzers:{self.colors['RESET']}")
+        # Show features
+        print(f"\n{self.colors['BOLD']}✨ Features:{self.colors['RESET']}")
         print("-" * 40)
-        for analyzer_name in self.analyzers.keys():
-            print(f"  • {analyzer_name.upper()}")
-        print()
+        print(f"  • {self.colors['GREEN']}4 Security Analyzers{self.colors['RESET']}")
+        print(f"  • {self.colors['GREEN']}3 Report Formats (Text/JSON/HTML){self.colors['RESET']}")
+        print(f"  • {self.colors['GREEN']}Professional HTML Reports{self.colors['RESET']}")
+        print(f"  • {self.colors['GREEN']}Color-coded Output{self.colors['RESET']}")
     
     def analyze_file(self, file_path, analyzers=None):
         """Analyze a single file"""
-        print(f"\n{self.colors['BOLD']}📁 Analyzing: {file_path}{self.colors['RESET']}")
+        print(f"\n{self.colors['BOLD']}📁 Analyzing:{self.colors['RESET']} {file_path}")
         print("=" * 60)
         
         try:
@@ -93,17 +105,29 @@ class SecurityAnalyzerCLI:
                 
                 for vuln in vulnerabilities:
                     vuln['analyzer'] = analyzer_name.upper()
+                    # Add timestamp for HTML report
+                    vuln['timestamp'] = datetime.now().strftime('%H:%M:%S')
                     all_vulnerabilities.append(vuln)
                     
-                    # Print vulnerability
-                    color = self.colors.get(vuln['severity'], self.colors['RESET'])
-                    print(f"{color}⚠️  [{vuln['severity']}] {vuln['type']}")
-                    print(f"   File: {vuln['filename']}:{vuln['line']}")
-                    print(f"   Message: {vuln['message']}")
+                    # Print vulnerability with colors
+                    severity = vuln.get('severity', 'INFO')
+                    color = self.colors.get(severity, self.colors['RESET'])
+                    
+                    print(f"{color}⚠️  [{severity}] {vuln['type']}{self.colors['RESET']}")
+                    print(f"   📍 {vuln['filename']}:{vuln['line']}")
+                    print(f"   📝 {vuln['message']}")
                     if 'code' in vuln and vuln['code']:
-                        print(f"   Code: {vuln['code'][:100]}...")
-                    print(f"   Recommendation: {vuln['recommendation']}")
-                    print(f"{self.colors['RESET']}")
+                        # Truncate long code snippets
+                        code_preview = vuln['code']
+                        if len(code_preview) > 100:
+                            code_preview = code_preview[:97] + "..."
+                        print(f"   📄 {code_preview}")
+                    if 'recommendation' in vuln:
+                        print(f"   💡 {vuln['recommendation']}")
+                    print()
+        
+        if not all_vulnerabilities:
+            print(f"{self.colors['GREEN']}✅ No vulnerabilities found!{self.colors['RESET']}")
         
         return all_vulnerabilities
     
@@ -118,65 +142,98 @@ class SecurityAnalyzerCLI:
                 if file.endswith('.py'):
                     python_files.append(os.path.join(root, file))
         
-        print(f"\nFound {len(python_files)} Python files to analyze")
+        print(f"\n📁 Found {len(python_files)} Python files to analyze")
         
-        for file_path in python_files:
+        for i, file_path in enumerate(python_files, 1):
+            print(f"\n[{i}/{len(python_files)}] ", end="")
             vulns = self.analyze_file(file_path, analyzers)
             all_vulnerabilities.extend(vulns)
         
         return all_vulnerabilities
     
-    def generate_report(self, vulnerabilities, output_format='text'):
-        """Generate a report of vulnerabilities"""
+    def generate_report(self, vulnerabilities, output_format='text', output_file=None):
+        """Generate a report in specified format"""
+        if not vulnerabilities:
+            print(f"\n{self.colors['GREEN']}📊 No vulnerabilities to report.{self.colors['RESET']}")
+            return ""
+        
+        print(f"\n{self.colors['BOLD']}📊 Generating {output_format.upper()} report...{self.colors['RESET']}")
+        
         if output_format == 'json':
-            return self._generate_json_report(vulnerabilities)
+            return self._generate_json_report(vulnerabilities, output_file)
+        elif output_format == 'html':
+            return self._generate_html_report(vulnerabilities, output_file)
         else:
-            return self._generate_text_report(vulnerabilities)
+            return self._generate_text_report(vulnerabilities, output_file)
     
-    def _generate_text_report(self, vulnerabilities):
+    def _generate_text_report(self, vulnerabilities, output_file=None):
         """Generate text report"""
-        report = []
-        report.append("\n" + "=" * 60)
-        report.append("SECURITY ANALYSIS REPORT")
-        report.append("=" * 60)
-        report.append(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        report.append(f"Total vulnerabilities found: {len(vulnerabilities)}")
+        report_lines = []
+        report_lines.append("\n" + "=" * 70)
+        report_lines.append("🔒 SECURITY ANALYSIS REPORT")
+        report_lines.append("=" * 70)
+        report_lines.append(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        report_lines.append(f"Total vulnerabilities: {len(vulnerabilities)}")
         
-        if vulnerabilities:
-            # Group by severity
-            severity_counts = {}
-            analyzer_counts = {}
-            
-            for vuln in vulnerabilities:
-                severity = vuln['severity']
-                analyzer = vuln.get('analyzer', 'Unknown')
-                
-                severity_counts[severity] = severity_counts.get(severity, 0) + 1
-                analyzer_counts[analyzer] = analyzer_counts.get(analyzer, 0) + 1
-            
-            report.append("\n📊 Severity Summary:")
-            for severity in ['HIGH', 'MEDIUM', 'LOW', 'INFO']:
-                count = severity_counts.get(severity, 0)
-                if count > 0:
-                    color = self.colors.get(severity, '')
-                    report.append(f"  {color}{severity}: {count}{self.colors['RESET']}")
-            
-            report.append("\n🔧 Analyzer Breakdown:")
-            for analyzer, count in sorted(analyzer_counts.items()):
-                report.append(f"  {analyzer}: {count}")
-        else:
-            report.append("\n✅ No vulnerabilities found!")
+        # Count by severity
+        severity_counts = {'HIGH': 0, 'MEDIUM': 0, 'LOW': 0, 'INFO': 0}
+        for vuln in vulnerabilities:
+            severity = vuln.get('severity', 'INFO')
+            severity_counts[severity] = severity_counts.get(severity, 0) + 1
         
-        return "\n".join(report)
+        report_lines.append(f"\n{self.colors['BOLD']}📊 Severity Summary:{self.colors['RESET']}")
+        report_lines.append("-" * 40)
+        for severity in ['HIGH', 'MEDIUM', 'LOW', 'INFO']:
+            count = severity_counts.get(severity, 0)
+            if count > 0:
+                color = self.colors.get(severity, '')
+                report_lines.append(f"{color}  {severity}: {count}{self.colors['RESET']}")
+        
+        report_text = "\n".join(report_lines)
+        
+        if output_file:
+            with open(output_file, 'w') as f:
+                f.write(report_text)
+            print(f"✅ Text report saved: {output_file}")
+        
+        return report_text
     
-    def _generate_json_report(self, vulnerabilities):
+    def _generate_json_report(self, vulnerabilities, output_file=None):
         """Generate JSON report"""
         report = {
-            'timestamp': datetime.now().isoformat(),
-            'total_vulnerabilities': len(vulnerabilities),
+            'metadata': {
+                'generated_at': datetime.now().isoformat(),
+                'tool': 'Database Security Static Analyzer',
+                'version': '1.0',
+                'total_vulnerabilities': len(vulnerabilities)
+            },
             'vulnerabilities': vulnerabilities
         }
-        return json.dumps(report, indent=2)
+        
+        json_report = json.dumps(report, indent=2)
+        
+        if output_file:
+            with open(output_file, 'w') as f:
+                f.write(json_report)
+            print(f"✅ JSON report saved: {output_file}")
+        
+        return json_report
+    
+    def _generate_html_report(self, vulnerabilities, output_file=None):
+        """Generate HTML report"""
+        if not self.html_reporter or not self.html_reporter.available:
+            print(f"{self.colors['YELLOW']}⚠️  HTML reports not available. Install Jinja2.{self.colors['RESET']}")
+            return ""
+        
+        if not output_file:
+            output_file = f"security_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
+        
+        result = self.html_reporter.generate(vulnerabilities, output_file)
+        if result:
+            print(f"✅ HTML report saved: {result}")
+            return result
+        else:
+            return ""
 
 def main():
     """Main CLI entry point"""
@@ -189,16 +246,20 @@ def main():
         epilog="""
 Examples:
   %(prog)s examples/test_code.py
-  %(prog)s src/ --analyzers sql,secrets
-  %(prog)s . --output json > report.json
+  %(prog)s . --format html --output report.html
+  %(prog)s src/ --analyzers sql,secrets --format json
+  %(prog)s test_vuln.py --format html --open
         """
     )
     
     parser.add_argument('path', help='File or directory to analyze')
     parser.add_argument('--analyzers', default='all',
                        help='Comma-separated list of analyzers: sql,secrets,db,input')
-    parser.add_argument('--output', default='text', choices=['text', 'json'],
+    parser.add_argument('--format', default='text', choices=['text', 'json', 'html'],
                        help='Output format')
+    parser.add_argument('--output', help='Save report to file')
+    parser.add_argument('--open', action='store_true', 
+                       help='Open HTML report in browser after generation')
     
     args = parser.parse_args()
     
@@ -214,6 +275,8 @@ Examples:
         sys.exit(1)
     
     # Analyze path
+    start_time = datetime.now()
+    
     if os.path.isfile(args.path):
         vulnerabilities = cli.analyze_file(args.path, analyzers_to_run)
     elif os.path.isdir(args.path):
@@ -223,22 +286,24 @@ Examples:
         sys.exit(1)
     
     # Generate report
-    report = cli.generate_report(vulnerabilities, args.output)
-    print(report)
+    report = cli.generate_report(vulnerabilities, args.format, args.output)
     
-    # Save report to file
-    if args.output == 'json':
-        report_file = f"security_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-        with open(report_file, 'w') as f:
-            f.write(report)
-        print(f"\n✅ JSON report saved to: {report_file}")
-    else:
-        report_file = f"security_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
-        with open(report_file, 'w') as f:
-            f.write(report)
-        print(f"\n✅ Text report saved to: {report_file}")
+    # Open HTML report in browser if requested
+    if args.format == 'html' and args.open:
+        report_file = args.output or f"security_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
+        try:
+            import webbrowser
+            webbrowser.open(f'file://{os.path.abspath(report_file)}')
+            print(f"🌐 Opened report in browser")
+        except:
+            print("⚠️  Could not open browser")
     
-    # Exit code based on findings - FIXED: Use 'HIGH' instead of 'RED'
+    # Calculate and display analysis time
+    end_time = datetime.now()
+    duration = (end_time - start_time).total_seconds()
+    print(f"\n⏱️  Analysis completed in {duration:.2f} seconds")
+    
+    # Exit code based on findings
     if any(v['severity'] in ['HIGH', 'MEDIUM'] for v in vulnerabilities):
         print(f"\n{cli.colors['BOLD']}{cli.colors['HIGH']}❌ Security issues found!{cli.colors['RESET']}")
         sys.exit(1)
