@@ -1,0 +1,31 @@
+general:
+  project_name: "My Custom Security Scan"
+  author: "Deepserish BK"
+
+analysis:
+  default_analyzers: ["sql", "secrets"]
+  max_file_size_mb: 5
+
+reports:
+  default_format: "html"
+  output_directory: "./my_reports"
+  auto_open_html: true
+
+analyzers:
+  sql_injection:
+    enabled: true
+    severity: "HIGH"
+    
+  hardcoded_secrets:
+    enabled: true
+    severity: "HIGH"
+    
+  database_connection:
+    enabled: false
+    
+  input_validation:
+    enabled: false
+
+severity:
+  high_threshold: 1
+  fail_on_high: true
