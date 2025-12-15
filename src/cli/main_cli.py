@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-DAY 10: Performance Optimized CLI
-Learning: Adding caching and parallel processing for speed
+DAY 10: Complete Performance Optimized CLI
 """
 
 import argparse
@@ -31,7 +30,7 @@ try:
     CONFIG_AVAILABLE = True
     PERFORMANCE_AVAILABLE = True
 except ImportError as e:
-    print(f"⚠️  Some modules not available: {e}")
+    print(f"⚠️  Import error: {e}")
     ANALYZERS_AVAILABLE = False
     HTML_REPORTS_AVAILABLE = False
     CONFIG_AVAILABLE = False
@@ -101,8 +100,8 @@ class SecurityAnalyzerCLI:
         else:
             print(f"  • {self.colors['YELLOW']}Performance features disabled{self.colors['RESET']}")
     
-    def analyze_file_fast(self, filepath, analyzer_name, analyzer):
-        """Fast file analysis with caching"""
+    def analyze_file(self, filepath, analyzer_name, analyzer):
+        """Analyze a single file"""
         if not os.path.exists(filepath):
             return []
         
@@ -121,6 +120,65 @@ class SecurityAnalyzerCLI:
             vuln['timestamp'] = datetime.now().strftime('%H:%M:%S')
         
         return vulnerabilities
+    
+    def analyze_single_file(self, filepath, analyzers=None):
+        """Analyze single file with caching"""
+        if not analyzers:
+            if self.config:
+                analyzers = self.config.get_enabled_analyzers()
+            else:
+                analyzers = self.analyzers.keys()
+        
+        print(f"\n{self.colors['BOLD']}📁 Analyzing:{self.colors['RESET']} {filepath}")
+        print("=" * 60)
+        
+        all_vulnerabilities = []
+        
+        for analyzer_name in analyzers:
+            if analyzer_name not in self.analyzers:
+                continue
+            
+            print(f"\n🔍 Running {analyzer_name.upper()} analyzer...")
+            
+            analyzer = self.analyzers[analyzer_name]
+            start_time = time.time()
+            
+            # Use cached analysis if optimizer available
+            if self.optimizer:
+                analyzer_func = lambda fp: self.analyze_file(fp, analyzer_name, analyzer)
+                results = self.optimizer.analyze_file_with_cache(
+                    filepath, 
+                    analyzer_func, 
+                    analyzer_name
+                )
+            else:
+                results = self.analyze_file(filepath, analyzer_name, analyzer)
+            
+            elapsed = time.time() - start_time
+            
+            # Display results
+            for vuln in results:
+                severity = vuln.get('severity', 'INFO')
+                color = self.colors.get(severity, self.colors['RESET'])
+                
+                print(f"{color}⚠️  [{severity}] {vuln['type']}{self.colors['RESET']}")
+                print(f"   📍 {vuln['filename']}:{vuln['line']}")
+                print(f"   📝 {vuln['message']}")
+                if 'code' in vuln and vuln['code']:
+                    code_preview = vuln['code'][:100] + "..." if len(vuln['code']) > 100 else vuln['code']
+                    print(f"   📄 {code_preview}")
+                if 'recommendation' in vuln:
+                    print(f"   💡 {vuln['recommendation']}")
+                print()
+            
+            if results:
+                print(f"   ⏱️  Found {len(results)} issues in {elapsed:.3f}s")
+            else:
+                print(f"   ✅ No issues found ({elapsed:.3f}s)")
+            
+            all_vulnerabilities.extend(results)
+        
+        return all_vulnerabilities
     
     def analyze_directory_fast(self, directory_path, analyzers=None):
         """Fast directory analysis with parallel processing"""
@@ -144,11 +202,6 @@ class SecurityAnalyzerCLI:
                         continue
                     
                     full_path = os.path.join(root, file)
-                    
-                    # Check if file should be analyzed
-                    if self.config and self.config.should_ignore_file(full_path):
-                        continue
-                    
                     python_files.append(full_path)
         
         print(f"\n📁 Found {len(python_files)} Python files")
@@ -176,7 +229,7 @@ class SecurityAnalyzerCLI:
             # Use optimizer if available
             if self.optimizer:
                 # Prepare analyzer function
-                analyzer_func = lambda fp: self.analyze_file_fast(fp, analyzer_name, analyzer)
+                analyzer_func = lambda fp: self.analyze_file(fp, analyzer_name, analyzer)
                 
                 # Run parallel analysis
                 results = self.optimizer.analyze_files_parallel(
@@ -191,13 +244,9 @@ class SecurityAnalyzerCLI:
             else:
                 # Fallback to sequential analysis
                 for i, filepath in enumerate(python_files):
-                    results = self.analyze_file_fast(filepath, analyzer_name, analyzer)
+                    results = self.analyze_file(filepath, analyzer_name, analyzer)
                     all_vulnerabilities.extend(results)
                     progress.update(1)
-                    
-                    # Show file progress occasionally
-                    if (i + 1) % 10 == 0:
-                        print(f"   Processed {i + 1}/{len(python_files)} files")
         
         progress.finish()
         
@@ -211,65 +260,6 @@ class SecurityAnalyzerCLI:
         
         return all_vulnerabilities
     
-    def analyze_single_file(self, filepath, analyzers=None):
-        """Analyze single file with caching"""
-        if not analyzers:
-            if self.config:
-                analyzers = self.config.get_enabled_analyzers()
-            else:
-                analyzers = self.analyzers.keys()
-        
-        print(f"\n{self.colors['BOLD']}📁 Analyzing:{self.colors['RESET']} {filepath}")
-        print("=" * 60)
-        
-        all_vulnerabilities = []
-        
-        for analyzer_name in analyzers:
-            if analyzer_name not in self.analyzers:
-                continue
-            
-            print(f"\n🔍 Running {analyzer_name.upper()} analyzer...")
-            
-            analyzer = self.analyzers[analyzer_name]
-            start_time = time.time()
-            
-            # Use cached analysis if optimizer available
-            if self.optimizer:
-                analyzer_func = lambda fp: self.analyze_file_fast(fp, analyzer_name, analyzer)
-                results = self.optimizer.analyze_file_with_cache(
-                    filepath, 
-                    analyzer_func, 
-                    analyzer_name
-                )
-            else:
-                results = self.analyze_file_fast(filepath, analyzer_name, analyzer)
-            
-            elapsed = time.time() - start_time
-            
-            # Display results
-            for vuln in results:
-                severity = vuln.get('severity', 'INFO')
-                color = self.colors.get(severity, self.colors['RESET'])
-                
-                print(f"{color}⚠️  [{severity}] {vuln['type']}{self.colors['RESET']}")
-                print(f"   📍 {vuln['filename']}:{vuln['line']}")
-                print(f"   📝 {vuln['message']}")
-                if 'code' in vuln:
-                    code_preview = vuln['code'][:100] + "..." if len(vuln['code']) > 100 else vuln['code']
-                    print(f"   📄 {code_preview}")
-                if 'recommendation' in vuln:
-                    print(f"   💡 {vuln['recommendation']}")
-                print()
-            
-            if results:
-                print(f"   ⏱️  Found {len(results)} issues in {elapsed:.3f}s")
-            else:
-                print(f"   ✅ No issues found ({elapsed:.3f}s)")
-        
-        return all_vulnerabilities
-    
-    # Keep the existing report generation methods from Day 9...
-    # [Previous report generation methods remain the same]
     def generate_report(self, vulnerabilities, output_format=None, output_file=None):
         """Generate report with config-based defaults"""
         if not vulnerabilities:
@@ -449,7 +439,7 @@ Examples:
     cache_subparsers.add_parser('clear', help='Clear cache')
     cache_subparsers.add_parser('stats', help='Show cache statistics')
     
-    # Config command (from Day 9)
+    # Config command
     config_parser = subparsers.add_parser('config', help='Configuration management')
     config_subparsers = config_parser.add_subparsers(dest='config_action', help='Config action')
     config_subparsers.add_parser('create', help='Create default config')
@@ -484,19 +474,15 @@ Examples:
                 vulnerabilities = cli.analyze_directory_fast(args.path, analyzers)
             else:
                 print(f"🐌 Starting standard analysis...")
-                # Fallback to single file analysis for each file
+                # Fallback to sequential analysis
                 vulnerabilities = []
-                python_files = []
                 for root, dirs, files in os.walk(args.path):
                     for file in files:
                         if file.endswith('.py'):
-                            python_files.append(os.path.join(root, file))
-                
-                print(f"📁 Found {len(python_files)} files")
-                for i, filepath in enumerate(python_files, 1):
-                    print(f"\n[{i}/{len(python_files)}] Analyzing {os.path.basename(filepath)}")
-                    vulns = cli.analyze_single_file(filepath, analyzers)
-                    vulnerabilities.extend(vulns)
+                            filepath = os.path.join(root, file)
+                            print(f"\nAnalyzing {filepath}")
+                            vulns = cli.analyze_single_file(filepath, analyzers)
+                            vulnerabilities.extend(vulns)
         else:
             print(f"❌ Path not found: {args.path}")
             sys.exit(1)
@@ -554,7 +540,6 @@ Examples:
                 print("❌ Performance optimizer not available")
     
     elif args.command == 'config':
-        # Config handling (same as Day 9)
         cli = SecurityAnalyzerCLI()
         
         if args.config_action == 'create':
@@ -572,7 +557,10 @@ Examples:
                 config = ConfigLoader(args.config if hasattr(args, 'config') else None)
                 print("\n📋 CONFIGURATION")
                 print("=" * 60)
-                config.print_summary()
+                # Create a simple print method
+                enabled = config.get_enabled_analyzers()
+                print(f"Enabled Analyzers: {', '.join(enabled)}")
+                print(f"Default Report Format: {config.get('reports.default_format', 'html')}")
         
         elif args.config_action == 'validate':
             if CONFIG_AVAILABLE and hasattr(args, 'config'):
@@ -580,13 +568,15 @@ Examples:
                 if os.path.exists(args.config):
                     config = ConfigLoader(args.config)
                     print(f"✅ Configuration is valid: {args.config}")
-                    config.print_summary()
+                    enabled = config.get_enabled_analyzers()
+                    print(f"Enabled Analyzers: {', '.join(enabled)}")
                 else:
                     print(f"❌ Configuration file not found: {args.config}")
     
     elif args.command == 'version':
         print("Database Security Static Analyzer v1.0")
         print("Day 10: Performance Optimization")
+        print("GitHub: https://github.com/deepserish-bk/db-security-scanner")
     
     else:
         parser.print_help()
