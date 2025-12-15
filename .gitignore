@@ -1,10 +1,80 @@
-__pycache/
-.env
-*.db
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
 venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Project specific
+.security_cache/
 reports/
-*.pyc
-.env
-*.db
-venv/
-reports/
+*.html
+*.json
+*.txt
+test_performance/
+day*/
+*.backup
+*.log
+
+# Test and temporary files
+test_*.py
+temp_*
+tmp/
+*.tmp
+*.temp
+
+# Config files (except default examples)
+security_config.local.yaml
+*.local.*
+
+# HTML reports (generated)
+*.report.html
+security_report_*.html
+security_report_*.json
+security_report_*.txt
+
+# Performance test directories
+test_performance/
+
+# Backup files
+*.bak
+*.backup
