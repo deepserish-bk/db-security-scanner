@@ -15,3 +15,5 @@ mypy==1.5.1
 sqlparse==0.4.4  # SQL parsing
 python-magic==0.4.27  # File type detectionJinja2>=3.0.0
 PyYAML>=6.0
+# Performance optimization
+psutil>=5.9.0
