@@ -13,22 +13,31 @@ eggs/
 lib/
 lib64/
 parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+sitemap.xml
+sitemap.xml.gz
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+.python-version
 
-# Virtual Environment
+# Virtual Environments
 venv/
 env/
+.venv/
 ENV/
 env.bak/
 venv.bak/
 
-# IDE
+# IDEs
 .vscode/
 .idea/
 *.swp
@@ -44,37 +53,28 @@ venv.bak/
 ehthumbs.db
 Thumbs.db
 
-# Project specific
-.security_cache/
-reports/
-*.html
-*.json
-*.txt
-test_performance/
-day*/
-*.backup
+# Project Specific
+reports/*.html
+reports/*.json
+reports/*.txt
+!reports/.gitkeep
+my_reports/
+security_cache/
+.cache/
 *.log
-
-# Test and temporary files
-test_*.py
-temp_*
-tmp/
 *.tmp
-*.temp
+test_output.html
+test_report.html
+day11_final_report.html
 
-# Config files (except default examples)
-security_config.local.yaml
-*.local.*
-
-# HTML reports (generated)
-*.report.html
-security_report_*.html
-security_report_*.json
-security_report_*.txt
-
-# Performance test directories
-test_performance/
+# Configurations (except template)
+*.yaml
+*.yml
+!security_config.yaml.example
+!my_custom_config.yaml.example
 
 # Backup files
-*.bak
 *.backup
+*_backup
+*_old
+backup_*
