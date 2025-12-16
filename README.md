@@ -28,11 +28,12 @@ This tool analyzes Python source code to identify security vulnerabilities relat
 git clone https://github.com/deepserish-bk/db-security-scanner.git
 cd db-security-scanner
 pip install -r requirements.txt
+```
 Usage
 
 Basic Analysis
 
-bash
+```bash
 # Analyze a single file
 python dbscan.py analyze file.py
 
@@ -43,14 +44,16 @@ python dbscan.py analyze src/
 python dbscan.py analyze . --format html
 python dbscan.py analyze . --format json
 python dbscan.py analyze . --format text
+```
 Configuration
 
-bash
+```bash
 # Create default configuration
 python dbscan.py config create
 
 # Use custom configuration
 python dbscan.py analyze . --config security_config.yaml
+```
 Output Examples
 
 Reports are saved to the reports/ directory by default:
@@ -58,6 +61,7 @@ Reports are saved to the reports/ directory by default:
 HTML reports: Visual security audit reports
 JSON reports: Structured data for CI/CD pipelines
 Text reports: Simple console output
+```bash
 Project Structure
 
 text
@@ -75,7 +79,7 @@ db-security-scanner/
 ├── tests/                # Test suite
 └── requirements.txt      # Python dependencies
 Security Analyzers
-
+```
 SQL Injection Analyzer
 
 Detects string concatenation in SQL execute() calls
