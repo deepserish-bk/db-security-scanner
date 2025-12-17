@@ -9,132 +9,155 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
         }
         
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #0a0a0a;
             min-height: 100vh;
             padding: 20px;
+            color: #f0f0f0;
         }
         
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 8px;
             overflow: hidden;
         }
         
         .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            color: white;
-            padding: 40px;
+            background: #000;
+            color: #fff;
+            padding: 30px;
             text-align: center;
+            border-bottom: 1px solid #333;
         }
         
         .header h1 {
-            font-size: 2.8rem;
+            font-size: 2.2rem;
             margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
+            color: #00ff00;
+            letter-spacing: -1px;
         }
         
         .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            margin-top: 10px;
+            font-size: 1rem;
+            color: #888;
+            font-family: 'Courier New', monospace;
         }
         
         .stats-cards {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            padding: 30px;
-            background: #f8f9fa;
+            gap: 15px;
+            padding: 25px;
+            background: #0a0a0a;
         }
         
         .card {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
+            background: #111;
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 6px;
             text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
         }
         
-        .card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .card.high { border-top: 5px solid #dc3545; }
-        .card.medium { border-top: 5px solid #ffc107; }
-        .card.low { border-top: 5px solid #17a2b8; }
-        .card.info { border-top: 5px solid #6c757d; }
+        .card.high { border-top: 3px solid #ff4444; }
+        .card.medium { border-top: 3px solid #ffaa00; }
+        .card.low { border-top: 3px solid #44aaff; }
+        .card.info { border-top: 3px solid #888; }
         
         .card .count {
-            font-size: 3rem;
+            font-size: 2.5rem;
             font-weight: bold;
             margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
         }
         
-        .card.high .count { color: #dc3545; }
-        .card.medium .count { color: #ffc107; }
-        .card.low .count { color: #17a2b8; }
-        .card.info .count { color: #6c757d; }
+        .card.high .count { color: #ff4444; }
+        .card.medium .count { color: #ffaa00; }
+        .card.low .count { color: #44aaff; }
+        .card.info .count { color: #888; }
+        
+        .card div:last-child {
+            color: #bbb;
+            font-size: 0.9rem;
+        }
         
         .vulnerabilities {
-            padding: 30px;
+            padding: 25px;
+        }
+        
+        .vulnerabilities h2 {
+            color: #f0f0f0;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
         }
         
         .vulnerability {
-            border: 1px solid #e9ecef;
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
-        }
-        
-        .vulnerability:hover {
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
-        }
-        
-        .vulnerability.high { border-left: 5px solid #dc3545; }
-        .vulnerability.medium { border-left: 5px solid #ffc107; }
-        .vulnerability.low { border-left: 5px solid #17a2b8; }
-        .vulnerability.info { border-left: 5px solid #6c757d; }
-        
-        .severity-badge {
-            display: inline-block;
-            padding: 8px 20px;
-            border-radius: 25px;
-            font-weight: bold;
-            font-size: 0.9rem;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 20px;
             margin-bottom: 15px;
         }
         
-        .severity-badge.high { background: #dc3545; color: white; }
-        .severity-badge.medium { background: #ffc107; }
-        .severity-badge.low { background: #17a2b8; color: white; }
-        .severity-badge.info { background: #6c757d; color: white; }
+        .vulnerability.high { border-left: 4px solid #ff4444; }
+        .vulnerability.medium { border-left: 4px solid #ffaa00; }
+        .vulnerability.low { border-left: 4px solid #44aaff; }
+        .vulnerability.info { border-left: 4px solid #888; }
+        
+        .severity-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.5px;
+        }
+        
+        .severity-badge.high { 
+            background: #2a0000; 
+            color: #ff4444; 
+            border: 1px solid #ff4444;
+        }
+        .severity-badge.medium { 
+            background: #2a2000; 
+            color: #ffaa00;
+            border: 1px solid #ffaa00;
+        }
+        .severity-badge.low { 
+            background: #002a2a; 
+            color: #44aaff;
+            border: 1px solid #44aaff;
+        }
+        .severity-badge.info { 
+            background: #1a1a1a; 
+            color: #888;
+            border: 1px solid #888;
+        }
         
         .vulnerability h3 {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             margin-bottom: 10px;
-            color: #2c3e50;
+            color: #f0f0f0;
         }
         
         .meta {
-            color: #6c757d;
-            font-size: 0.95rem;
+            color: #888;
+            font-size: 0.85rem;
             margin-bottom: 15px;
             display: flex;
             align-items: center;
             gap: 15px;
+            font-family: 'Courier New', monospace;
         }
         
         .meta span {
@@ -143,71 +166,111 @@
             gap: 5px;
         }
         
+        .vulnerability p {
+            color: #ccc;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
         .code-block {
-            background: #2c3e50;
-            color: #ecf0f1;
-            padding: 20px;
-            border-radius: 8px;
+            background: #000;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 4px;
             margin: 15px 0;
-            font-family: 'Courier New', monospace;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+            border: 1px solid #333;
             overflow-x: auto;
         }
         
+        .code-block pre {
+            white-space: pre-wrap;
+        }
+        
         .recommendation {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            border-radius: 8px;
-            padding: 20px;
+            background: #001a00;
+            border: 1px solid #00aa00;
+            border-radius: 4px;
+            padding: 15px;
             margin-top: 15px;
         }
         
         .recommendation h4 {
-            color: #155724;
+            color: #00ff00;
             margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-size: 1rem;
+        }
+        
+        .recommendation p {
+            color: #aaffaa;
+            margin: 0;
         }
         
         .footer {
             text-align: center;
-            padding: 30px;
-            background: #f8f9fa;
-            border-top: 1px solid #e9ecef;
-            color: #6c757d;
+            padding: 25px;
+            background: #000;
+            border-top: 1px solid #333;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .footer p:first-child {
+            color: #888;
+            margin-bottom: 5px;
+        }
+        
+        .footer p:last-child {
+            color: #00ff00;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
         }
         
         .no-vulnerabilities {
             text-align: center;
-            padding: 60px;
-            color: #28a745;
+            padding: 50px;
+            color: #00ff00;
+            border: 1px solid #333;
+            border-radius: 6px;
+            background: #000;
         }
         
         .no-vulnerabilities h2 {
-            font-size: 2rem;
-            margin-bottom: 20px;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .no-vulnerabilities p {
+            color: #aaa;
         }
         
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
             .container {
-                border-radius: 10px;
+                border-radius: 4px;
             }
             
             .header {
-                padding: 25px;
+                padding: 20px;
             }
             
             .header h1 {
-                font-size: 2rem;
+                font-size: 1.8rem;
             }
             
             .stats-cards {
                 grid-template-columns: 1fr;
-                padding: 20px;
+                padding: 15px;
+                gap: 10px;
             }
             
             .vulnerabilities {
-                padding: 20px;
+                padding: 15px;
             }
             
             .meta {
@@ -215,15 +278,19 @@
                 align-items: flex-start;
                 gap: 5px;
             }
+            
+            .card .count {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔒 Security Analysis Report</h1>
+            <h1>SECURITY ANALYSIS REPORT</h1>
             <div class="subtitle">
-                Generated on {{ timestamp }} | Database Security Static Analyzer v1.0
+                Generated on {{ timestamp }} | DB Security Static Analyzer v1.0
             </div>
         </div>
         
@@ -248,7 +315,7 @@
         
         <div class="vulnerabilities">
             {% if vulnerabilities %}
-                <h2 style="margin-bottom: 20px;">Found {{ total_vulnerabilities }} Vulnerabilities</h2>
+                <h2>FOUND {{ total_vulnerabilities }} VULNERABILITIES</h2>
                 
                 {% for vuln in vulnerabilities %}
                 <div class="vulnerability {{ vuln.severity.lower() }}">
@@ -272,7 +339,7 @@
                     
                     {% if vuln.recommendation %}
                     <div class="recommendation">
-                        <h4>💡 Recommendation</h4>
+                        <h4>RECOMMENDATION</h4>
                         <p>{{ vuln.recommendation }}</p>
                     </div>
                     {% endif %}
@@ -280,15 +347,16 @@
                 {% endfor %}
             {% else %}
                 <div class="no-vulnerabilities">
-                    <h2>✅ No Vulnerabilities Found!</h2>
+                    <h2>✅ NO VULNERABILITIES FOUND</h2>
                     <p>Your code appears to be secure. Great job!</p>
                 </div>
             {% endif %}
         </div>
         
         <div class="footer">
-            <p>Generated by Database Security Static Analyzer | 30-Day Learning Project</p>
+            <p>Generated by Database Security Static Analyzer</p>
             <p>This report is generated automatically. Please review with your security team.</p>
+            <p>With ❤️ DEEPSRISH B K</p>
         </div>
     </div>
 </body>
