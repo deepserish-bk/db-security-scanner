@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-DAY 10: Complete Performance Optimized CLI
+Database Security Scanner CLI
 """
 
 import argparse
@@ -21,6 +21,8 @@ try:
     from src.analyzers.hardcoded_secrets import HardcodedSecretsAnalyzer
     from src.analyzers.database_connection import DatabaseConnectionAnalyzer
     from src.analyzers.input_validation import InputValidationAnalyzer
+    from src.analyzers.database_specific import DatabaseSpecificAnalyzer
+    from src.analyzers.orm_security import ORMSecurityAnalyzer
     from src.report.html_generator import HTMLReportGenerator
     from src.config.config_loader import ConfigLoader
     from src.utils.performance import PerformanceOptimizer, ProgressTracker
@@ -52,7 +54,9 @@ class SecurityAnalyzerCLI:
                 'sql': SQLInjectionAnalyzer(),
                 'secrets': HardcodedSecretsAnalyzer(),
                 'db': DatabaseConnectionAnalyzer(),
-                'input': InputValidationAnalyzer()
+                'input': InputValidationAnalyzer(),
+                'db_specific': DatabaseSpecificAnalyzer(),
+                'orm': ORMSecurityAnalyzer()
             }
         else:
             self.analyzers = {}
@@ -77,15 +81,13 @@ class SecurityAnalyzerCLI:
         }
     
     def print_banner(self):
-        """Print tool banner with performance info"""
-        version = self.config.get('general.version', '1.0') if self.config else '1.0'
+        """Print tool banner"""
+        version = self.config.get('general.version', '1.2.0') if self.config else '1.2.0'
         
-        banner = f"""
-{self.colors['BOLD']}{self.colors['MAGENTA']}
+        banner = f"""{self.colors['BOLD']}{self.colors['CYAN']}
 ╔══════════════════════════════════════════════════════════╗
-║          DATABASE SECURITY STATIC ANALYZER v{version:<10}   ║
-║                   30-Day Learning Project                ║
-║                    Day 10: Performance                   ║
+║               DATABASE SECURITY SCANNER                  ║
+║                     Version {version:<8}                    ║
 ╚══════════════════════════════════════════════════════════╝{self.colors['RESET']}
         """
         print(banner)
@@ -313,7 +315,7 @@ class SecurityAnalyzerCLI:
         report_lines.append("=" * 70)
         
         if self.config:
-            project = self.config.get('general.project_name', 'Database Security Static Analyzer')
+            project = self.config.get('general.project_name', 'Database Security Scanner')
             report_lines.append(f"Project: {project}")
         
         report_lines.append(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
@@ -345,8 +347,8 @@ class SecurityAnalyzerCLI:
         report = {
             'metadata': {
                 'generated_at': datetime.now().isoformat(),
-                'tool': self.config.get('general.project_name', 'Database Security Static Analyzer') if self.config else 'Database Security Static Analyzer',
-                'version': self.config.get('general.version', '1.0') if self.config else '1.0',
+                'tool': self.config.get('general.project_name', 'Database Security Scanner') if self.config else 'Database Security Scanner',
+                'version': self.config.get('general.version', '1.2.0') if self.config else '1.2.0',
                 'total_vulnerabilities': len(vulnerabilities)
             },
             'vulnerabilities': vulnerabilities
@@ -402,7 +404,7 @@ class SecurityAnalyzerCLI:
 def main():
     """Main CLI entry point with performance features"""
     parser = argparse.ArgumentParser(
-        description='Performance-Optimized Security Analyzer',
+        description='Database Security Scanner',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -574,8 +576,7 @@ Examples:
                     print(f"❌ Configuration file not found: {args.config}")
     
     elif args.command == 'version':
-        print("Database Security Static Analyzer v1.0")
-        print("Day 10: Performance Optimization")
+        print("Database Security Scanner v1.2.0")
         print("GitHub: https://github.com/deepserish-bk/db-security-scanner")
     
     else:
