@@ -3,284 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Security Analysis Report</title>
+    <title>Security Report</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
+            font-family: 'Courier New', 'Lucida Console', Monaco, monospace;
         }
         
         body {
-            background: #0a0a0a;
-            min-height: 100vh;
-            padding: 20px;
-            color: #f0f0f0;
+            background: #000;
+            color: #c0c0c0;
+            font-size: 13px;
+            line-height: 1.3;
+            padding: 10px;
+            -webkit-font-smoothing: none;
+            -moz-osx-font-smoothing: grayscale;
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1100px;
             margin: 0 auto;
-            background: #111;
-            border: 1px solid #333;
-            border-radius: 8px;
-            overflow: hidden;
         }
         
         .header {
-            background: #000;
-            color: #fff;
-            padding: 30px;
             text-align: center;
+            padding: 15px 0;
             border-bottom: 1px solid #333;
+            margin-bottom: 20px;
         }
         
         .header h1 {
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-            color: #00ff00;
-            letter-spacing: -1px;
+            font-size: 16px;
+            color: #0f0;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
         }
         
         .subtitle {
-            font-size: 1rem;
-            color: #888;
+            color: #666;
+            font-size: 11px;
             font-family: 'Courier New', monospace;
         }
         
-        .stats-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            padding: 25px;
-            background: #0a0a0a;
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
         }
         
-        .card {
-            background: #111;
-            padding: 20px;
-            border: 1px solid #333;
-            border-radius: 6px;
+        .stat {
             text-align: center;
+            padding: 8px 12px;
+            min-width: 80px;
         }
         
-        .card.high { border-top: 3px solid #ff4444; }
-        .card.medium { border-top: 3px solid #ffaa00; }
-        .card.low { border-top: 3px solid #44aaff; }
-        .card.info { border-top: 3px solid #888; }
+        .stat.high .count { color: #f00; }
+        .stat.medium .count { color: #ff0; }
+        .stat.low .count { color: #0af; }
+        .stat.info .count { color: #888; }
         
-        .card .count {
-            font-size: 2.5rem;
+        .count {
+            font-size: 22px;
             font-weight: bold;
-            margin-bottom: 10px;
-            font-family: 'Courier New', monospace;
+            margin-bottom: 2px;
         }
         
-        .card.high .count { color: #ff4444; }
-        .card.medium .count { color: #ffaa00; }
-        .card.low .count { color: #44aaff; }
-        .card.info .count { color: #888; }
-        
-        .card div:last-child {
-            color: #bbb;
-            font-size: 0.9rem;
-        }
-        
-        .vulnerabilities {
-            padding: 25px;
-        }
-        
-        .vulnerabilities h2 {
-            color: #f0f0f0;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
-        }
-        
-        .vulnerability {
-            background: #111;
-            border: 1px solid #333;
-            border-radius: 6px;
-            padding: 20px;
-            margin-bottom: 15px;
-        }
-        
-        .vulnerability.high { border-left: 4px solid #ff4444; }
-        .vulnerability.medium { border-left: 4px solid #ffaa00; }
-        .vulnerability.low { border-left: 4px solid #44aaff; }
-        .vulnerability.info { border-left: 4px solid #888; }
-        
-        .severity-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 0.8rem;
-            margin-bottom: 15px;
-            font-family: 'Courier New', monospace;
+        .label {
+            color: white;
+            font-size: 10px;
+            text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         
-        .severity-badge.high { 
-            background: #2a0000; 
-            color: #ff4444; 
-            border: 1px solid #ff4444;
-        }
-        .severity-badge.medium { 
-            background: #2a2000; 
-            color: #ffaa00;
-            border: 1px solid #ffaa00;
-        }
-        .severity-badge.low { 
-            background: #002a2a; 
-            color: #44aaff;
-            border: 1px solid #44aaff;
-        }
-        .severity-badge.info { 
-            background: #1a1a1a; 
-            color: #888;
-            border: 1px solid #888;
+        .summary {
+            color:white;
+            text-align: center;
+            font-size: 12px;
+            margin-bottom: 20px;
+            padding: 5px;
+            border-top: 1px solid #222;
+            border-bottom: 1px solid #222;
         }
         
-        .vulnerability h3 {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            color: #f0f0f0;
+        .vulnerabilities {
+            margin-top: 20px;
         }
         
-        .meta {
-            color: #888;
-            font-size: 0.85rem;
-            margin-bottom: 15px;
+        .vuln {
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #222;
+        }
+        
+        .vuln:last-child {
+            border-bottom: none;
+        }
+        
+        .severity {
+            display: inline-block;
+            font-weight: bold;
+            font-size: 11px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+        
+        .vuln.high .severity { color: #f00; }
+        .vuln.medium .severity { color: #ff0; }
+        .vuln.low .severity { color: #0af; }
+        .vuln.info .severity { color: #888; }
+        
+        .type {
+            color: #fff;
+            font-size: 13px;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        
+        .location {
+            color: #0af;
+            font-size: 11px;
+            margin-bottom: 8px;
             display: flex;
-            align-items: center;
             gap: 15px;
-            font-family: 'Courier New', monospace;
         }
         
-        .meta span {
-            display: flex;
-            align-items: center;
-            gap: 5px;
+        .location span {
+            color: #fffefe;
         }
         
-        .vulnerability p {
-            color: #ccc;
-            line-height: 1.5;
-            margin-bottom: 15px;
+        .message {
+            color: #ffffff;
+            margin-bottom: 10px;
+            font-size: 12px;
         }
         
         .code-block {
-            background: #000;
-            color: #00ff00;
-            padding: 15px;
-            border-radius: 4px;
-            margin: 15px 0;
-            font-family: 'Monaco', 'Consolas', monospace;
-            font-size: 0.9rem;
+            background: #111;
             border: 1px solid #333;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 12px;
             overflow-x: auto;
+            white-space: pre;
         }
         
         .code-block pre {
-            white-space: pre-wrap;
+            color: white;
+            font-family: 'Courier New', 'Lucida Console', Monaco, monospace;
+            margin: 0;
         }
         
         .recommendation {
             background: #001a00;
-            border: 1px solid #00aa00;
-            border-radius: 4px;
-            padding: 15px;
-            margin-top: 15px;
+            border-left: 2px solid #0f0;
+            padding: 8px 10px;
+            margin-top: 10px;
+            font-size: 12px;
         }
         
-        .recommendation h4 {
-            color: #00ff00;
+        .recommendation strong {
+            color: rgb(255, 230, 0);
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+        
+        .no-vulns {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgb(255, 230, 0);
+            font-size: 14px;
+            border: 1px dashed #333;
+        }
+        
+        .no-vulns h2 {
             margin-bottom: 10px;
-            font-size: 1rem;
-        }
-        
-        .recommendation p {
-            color: #aaffaa;
-            margin: 0;
         }
         
         .footer {
-            text-align: center;
-            padding: 25px;
-            background: #000;
+            margin-top: 30px;
+            padding-top: 15px;
             border-top: 1px solid #333;
             color: #666;
-            font-size: 0.9rem;
+            font-size: 11px;
+            text-align: center;
         }
         
-        .footer p:first-child {
-            color: #888;
+        .footer p {
             margin-bottom: 5px;
         }
         
-        .footer p:last-child {
-            color: #00ff00;
-            margin-top: 10px;
-            font-family: 'Courier New', monospace;
+        .footer .signature {
+            color: #0f0;
+            margin-top: 8px;
+            font-size: 12px;
         }
         
-        .no-vulnerabilities {
-            text-align: center;
-            padding: 50px;
-            color: #00ff00;
-            border: 1px solid #333;
-            border-radius: 6px;
-            background: #000;
+        /* Terminal-like scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
         }
         
-        .no-vulnerabilities h2 {
-            font-size: 1.8rem;
-            margin-bottom: 15px;
-            font-family: 'Courier New', monospace;
+        ::-webkit-scrollbar-track {
+            background: #111;
         }
         
-        .no-vulnerabilities p {
-            color: #aaa;
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #444;
         }
         
         @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-            
-            .container {
-                border-radius: 4px;
-            }
-            
-            .header {
-                padding: 20px;
-            }
-            
-            .header h1 {
-                font-size: 1.8rem;
-            }
-            
-            .stats-cards {
-                grid-template-columns: 1fr;
-                padding: 15px;
+            .stats {
                 gap: 10px;
             }
             
-            .vulnerabilities {
-                padding: 15px;
+            .stat {
+                min-width: 70px;
+                padding: 6px 8px;
             }
             
-            .meta {
+            .location {
                 flex-direction: column;
-                align-items: flex-start;
                 gap: 5px;
-            }
-            
-            .card .count {
-                font-size: 2rem;
             }
         }
     </style>
@@ -289,47 +241,47 @@
     <div class="container">
         <div class="header">
             <h1>SECURITY ANALYSIS REPORT</h1>
-            <div class="subtitle">
-                Generated on {{ timestamp }} | DB Security Static Analyzer v1.0
+            <div class="subtitle">Generated: {{ timestamp }} | DB Security Analyzer v1.0</div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat high">
+                <div class="count">{{ severity_counts.HIGH }}</div>
+                <div class="label">HIGH</div>
+            </div>
+            <div class="stat medium">
+                <div class="count">{{ severity_counts.MEDIUM }}</div>
+                <div class="label">MEDIUM</div>
+            </div>
+            <div class="stat low">
+                <div class="count">{{ severity_counts.LOW }}</div>
+                <div class="label">LOW</div>
+            </div>
+            <div class="stat info">
+                <div class="count">{{ severity_counts.INFO }}</div>
+                <div class="label">INFO</div>
             </div>
         </div>
         
-        <div class="stats-cards">
-            <div class="card high">
-                <div class="count">{{ severity_counts.HIGH }}</div>
-                <div>High Severity</div>
-            </div>
-            <div class="card medium">
-                <div class="count">{{ severity_counts.MEDIUM }}</div>
-                <div>Medium Severity</div>
-            </div>
-            <div class="card low">
-                <div class="count">{{ severity_counts.LOW }}</div>
-                <div>Low Severity</div>
-            </div>
-            <div class="card info">
-                <div class="count">{{ severity_counts.INFO }}</div>
-                <div>Informational</div>
-            </div>
+        {% if vulnerabilities %}
+        <div class="summary">
+            Found {{ total_vulnerabilities }} security issue{{ 's' if total_vulnerabilities != 1 else '' }}
         </div>
+        {% endif %}
         
         <div class="vulnerabilities">
             {% if vulnerabilities %}
-                <h2>FOUND {{ total_vulnerabilities }} VULNERABILITIES</h2>
-                
                 {% for vuln in vulnerabilities %}
-                <div class="vulnerability {{ vuln.severity.lower() }}">
-                    <div class="severity-badge {{ vuln.severity.lower() }}">
-                        {{ vuln.severity }}
-                    </div>
-                    <h3>{{ vuln.type }}</h3>
+                <div class="vuln {{ vuln.severity.lower() }}">
+                    <div class="severity">{{ vuln.severity }}</div>
+                    <div class="type">{{ vuln.type }}</div>
                     
-                    <div class="meta">
-                        <span>📁 {{ vuln.filename }}:{{ vuln.line }}</span>
-                        <span>🕒 {{ vuln.timestamp }}</span>
+                    <div class="location">
+                        <span>File:</span> {{ vuln.filename }}:{{ vuln.line }}
+                        <span>Time:</span> {{ vuln.timestamp }}
                     </div>
                     
-                    <p>{{ vuln.message }}</p>
+                    <div class="message">{{ vuln.message }}</div>
                     
                     {% if vuln.code %}
                     <div class="code-block">
@@ -339,24 +291,23 @@
                     
                     {% if vuln.recommendation %}
                     <div class="recommendation">
-                        <h4>RECOMMENDATION</h4>
-                        <p>{{ vuln.recommendation }}</p>
+                        <strong>Recommendation:</strong> {{ vuln.recommendation }}
                     </div>
                     {% endif %}
                 </div>
                 {% endfor %}
             {% else %}
-                <div class="no-vulnerabilities">
-                    <h2>✅ NO VULNERABILITIES FOUND</h2>
-                    <p>Your code appears to be secure. Great job!</p>
+                <div class="no-vulns">
+                    <h2>✅ CLEAN</h2>
+                    <p>No vulnerabilities detected</p>
                 </div>
             {% endif %}
         </div>
         
         <div class="footer">
             <p>Generated by Database Security Static Analyzer</p>
-            <p>This report is generated automatically. Please review with your security team.</p>
-            <p>With ❤️ DEEPSRISH B K</p>
+            <p>Report automatically generated - review with security team</p>
+            <p class="signature">Made with ❤️ by DEEPSRISH B K</p>
         </div>
     </div>
 </body>

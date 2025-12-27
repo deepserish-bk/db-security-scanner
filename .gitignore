@@ -1,4 +1,9 @@
-# Python
+# ============================================
+# PYTHON SECURITY SCANNER PROJECT
+# ============================================
+
+# ========== PYTHON SPECIFIC ==========
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
@@ -13,38 +18,126 @@ eggs/
 lib/
 lib64/
 parts/
-sitemap.xml
-sitemap.xml.gz
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
-.pytest_cache/
+
+# Unit test / coverage reports
+htmlcov/
 .tox/
+.nox/
 .coverage
 .coverage.*
 .cache
 nosetests.xml
 coverage.xml
 *.cover
+*.py,cover
 .hypothesis/
 .pytest_cache/
+cover/
+
+# pyenv
 .python-version
 
-# Virtual Environments
+# ========== PROJECT SPECIFIC ==========
+# Generated reports
+reports/
+*.html
+*.json
+*.txt
+*.md
+*.log
+
+# Security cache
+.security_cache/
+.cache/
+.cache/
+*.cache
+
+# Test outputs
+test_output/
+test-reports/
+pytest-report.html
+
+# User configurations
+*_config.yaml
+my_*.yaml
+config.local.yaml
+.local.yaml
+.env
+.env.local
+.env.*.local
+secrets.yaml
+credentials.yaml
+
+# ========== VIRTUAL ENVIRONMENTS ==========
+# Virtualenv
 venv/
 env/
-.venv/
 ENV/
 env.bak/
 venv.bak/
+pythonenv*
 
-# IDEs
+# Conda
+.conda/
+conda/
+
+# ========== IDE & EDITORS ==========
+# VS Code
 .vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# PyCharm
 .idea/
+*.iws
+*.iml
+*.ipr
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Vim
 *.swp
 *.swo
 *~
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
 
-# OS
+# Emacs
+*~
+\#*
+.\#*
+*.*~
+*.bak
+
+# Sublime Text
+*.sublime-*
+
+# ========== OPERATING SYSTEM ==========
+# macOS
 .DS_Store
 .DS_Store?
 ._*
@@ -53,28 +146,57 @@ venv.bak/
 ehthumbs.db
 Thumbs.db
 
-# Project Specific
-reports/*.html
-reports/*.json
-reports/*.txt
-!reports/.gitkeep
-my_reports/
-security_cache/
-.cache/
-*.log
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# ========== GIT ==========
+# Git
+*.orig
+*.rej
+
+# ========== DOCUMENTATION ==========
+# Sphinx
+docs/_build/
+docs/source/generated/
+
+# ========== DOCKER ==========
+# Docker
+.docker/
+
+# ========== MISC ==========
+# Temporary files
+tmp/
+temp/
 *.tmp
-test_output.html
-test_report.html
-day11_final_report.html
+*.temp
 
-# Configurations (except template)
-*.yaml
-*.yml
-!security_config.yaml.example
-!my_custom_config.yaml.example
+# Logs
+*.log
+logs/
 
-# Backup files
-*.backup
-*_backup
-*_old
-backup_*
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Profiling data
+.prof
+
+# ============================================
+# KEEP THESE (DO NOT IGNORE):
+# ============================================
+# !src/analyzers/
+# !src/utils/
+# !examples/
+# !tests/
+# !requirements.txt
+# !README.md
+# !LICENSE
+# !src/main.py
+# !research_notes.md
